@@ -1,11 +1,16 @@
-import { render } from './render';
-import FilterView from './view/filters';
-import RenderingComponents from './presenter/rendering_components';
+import { render } from './render.js';
+import MenuView from './view/menu.js';
+import FilterView from './view/filters.js';
+import RenderingComponents from './presenter/rendering-components.js';
 
-const FILTER_CONTAINER = document.querySelector('.trip-controls__filters');
-const TRIP_CONTAINER = document.querySelector('.trip-events');
 
-const presenter = new RenderingComponents({container: TRIP_CONTAINER});
+const menuContainer = document.querySelector('.trip-controls__navigation');
+const filterContainer = document.querySelector('.trip-controls__filters');
+const tripContainer = document.querySelector('.trip-events');
 
-render(new FilterView(), FILTER_CONTAINER);
-presenter.init();
+const presenter = new RenderingComponents();
+
+render(new MenuView, menuContainer);
+render(new FilterView, filterContainer);
+
+presenter.init(tripContainer);
