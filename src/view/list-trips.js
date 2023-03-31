@@ -1,8 +1,8 @@
-import { createElement } from '../render';
+import { createElement } from '../render.js';
 
 const createListTripsTemplate = () => (
   `<ul class="trip-events__list">
-  </ul>`
+   </ul>`
 );
 
 
@@ -13,7 +13,7 @@ export default class ListTripsView {
 
   getElement() {
     if (!this.element) {
-      return createElement(this.getTemplate());
+      this.element = createElement(this.getTemplate());
     }
 
     return this.element;
