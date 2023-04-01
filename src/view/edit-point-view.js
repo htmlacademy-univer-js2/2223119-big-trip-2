@@ -1,11 +1,11 @@
 import { createElement } from '../render.js';
 import { APPOINTMENTS, OFFERS, OFFERS_BY_TYPE } from '../mock/route.js';
 
-const createDestionationsOptionsTemplate = (destinations) =>
+const createDestionations = (destinations) =>
   destinations.reduce((result, destination) =>
     result.concat(`<option value="${ destination.name }"></option>\n`), '');
 
-const createAvailableOptionsTemplate = (offers, event) => {
+const createAvailable = (offers, event) => {
   const availableOffers = OFFERS_BY_TYPE.find((item) => (item.type === event)).offers;
   let offerOptions = '';
 
@@ -29,7 +29,7 @@ const createAvailableOptionsTemplate = (offers, event) => {
 
 const createDestinationDescriptionTemplate = (destinations, name) => destinations.find((it) => it.name === name).description;
 
-const createFormEditingTemplate = (event) => {
+const createEditPointTemplate = (event) => {
   const { destination, type } = event;
   const name = APPOINTMENTS.find((item) => (item.id === destination)).name;
 
@@ -89,7 +89,7 @@ const createFormEditingTemplate = (event) => {
                 </label>
                 <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="Chamonix" list="destination-list-1">
                 <datalist id="destination-list-1">
-                  ${ createDestionationsOptionsTemplate(APPOINTMENTS) }
+                  ${ createDestionations(APPOINTMENTS) }
                 </datalist>
               </div>
               <div class="event__field-group  event__field-group--time">
@@ -116,7 +116,7 @@ const createFormEditingTemplate = (event) => {
               <section class="event__section  event__section--offers">
                 <h3 class="event__section-title  event__section-title--offers">Offers</h3>
                 <div class="event__available-offers">
-                ${ createAvailableOptionsTemplate(OFFERS, type) }
+                ${ createAvailable(OFFERS, type) }
                 </div>
               </section>
               <section class="event__section  event__section--destination">
@@ -128,24 +128,24 @@ const createFormEditingTemplate = (event) => {
 };
 
 
-export default class FormEditingView {
-  constructor(event) {
-    this.event = event;
+export default class EditPointView {
+  constructor(point) {
+    this._point = point;
   }
 
   getTemplate() {
-    return createFormEditingTemplate(this.event);
+    return createEditPointTemplate(this._point);
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
+  get element() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
     }
 
-    return this.element;
+    return this._element;
   }
 
   removeElement() {
-    this.element = null;
+    this._element = null;
   }
 }
