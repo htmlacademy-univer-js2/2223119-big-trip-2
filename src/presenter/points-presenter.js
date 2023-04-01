@@ -4,6 +4,7 @@ import PointView from '../view/point-view.js';
 import SortingView from '../view/sorting-view.js';
 import ListPointsView from '../view/list-points-view.js';
 import PointsModel from '../model/point-model.js';
+import NoPointView from '../view/no-point-view.js';
 
 export default class PointPresenter {
   constructor() {
@@ -60,6 +61,10 @@ export default class PointPresenter {
       render(pointComponent, this._listRoutes.element);
     };
 
-    this._points.forEach((point) => this._createPoint(point));
+    if (this._points.length === 0) {
+      render(new NoPointView(), this._listRoutes.element);
+    } else {
+      this._points.forEach((point) => this._createPoint(point));
+    }
   }
 }
