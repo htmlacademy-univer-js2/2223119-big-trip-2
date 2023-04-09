@@ -1,4 +1,4 @@
-import { createElement } from '../render.js';
+import AbstractView from '../framework/view/abstract-view';
 import { APPOINTMENTS, OFFERS, OFFERS_BY_TYPE } from '../mock/route.js';
 
 const createDestionations = (destinations) =>
@@ -128,24 +128,35 @@ const createEditPointTemplate = (event) => {
 };
 
 
-export default class EditPointView {
+export default class EditPointView extends AbstractView {
+  #point;
+
   constructor(point) {
-    this._point = point;
+    super();
+    this.#point = point;
   }
 
-  getTemplate() {
-    return createEditPointTemplate(this._point);
+  get template() {
+    return createEditPointTemplate(this.#point);
   }
 
-  get element() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
+  #pointClickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.click();
+  };
 
-    return this._element;
-  }
+  #submitHandler = (evt) =>{
+    evt.preventDefault();
+    this._callback.click();
+  };
 
-  removeElement() {
-    this._element = null;
-  }
+  setPointClickHandler = (evt) => {
+    this._callback.click = evt;
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#pointClickHandler);
+  };
+
+  setSubmitHandler = (evt) => {
+    this._callback.click = evt;
+    this.element.querySelector('.event__save-btn').addEventListener('submit', this.#submitHandler);
+  };
 }

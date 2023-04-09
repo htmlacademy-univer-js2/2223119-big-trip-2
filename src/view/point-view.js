@@ -1,4 +1,4 @@
-import { createElement } from '../render.js';
+import AbstractView from '../framework/view/abstract-view';
 import { APPOINTMENTS, OFFERS } from '../mock/route.js';
 import { humanizeDay, humanizeHour, calculateTime, favoritePoint } from '../utils.js';
 
@@ -56,24 +56,25 @@ const createPointTemplate = (point) => {
       </li>`;
 };
 
-export default class PointView {
+export default class PointView extends AbstractView {
+  #point;
+
   constructor(point) {
-    this._point = point;
+    super();
+    this.#point = point;
   }
 
-  _getTemplate() {
-    return this._element;
+  get template() {
+    return createPointTemplate(this.#point);
   }
 
-  get element() {
-    if (!this._element){
-      this._element = createElement(createPointTemplate(this._point));
-    }
+  #editClickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.click();
+  };
 
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
-  }
+  setEditClickHandler = (evt) => {
+    this._callback.click = evt;
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#editClickHandler);
+  };
 }
