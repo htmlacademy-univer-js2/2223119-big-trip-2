@@ -1,4 +1,4 @@
-import { render } from '../render.js';
+import { render, replace } from '../framework/render.js';
 import EditPointView from '../view/edit-point-view.js';
 import PointView from '../view/point-view.js';
 import SortingView from '../view/sorting-view.js';
@@ -6,65 +6,61 @@ import ListPointsView from '../view/list-points-view.js';
 import PointsModel from '../model/point-model.js';
 import NoPointView from '../view/no-point-view.js';
 
-export default class PointPresenter {
+export default class PointsPresenter {
+  #container;
+  #listPoints;
+  #routesModel;
+  #points;
+
   constructor() {
-    this._container = null;
-    this._listRoutes = new ListPointsView();
-    this._routesModel = null;
-    this._points = null;
+    this.#listPoints = new ListPointsView();
   }
 
   init(container) {
-    this._container = container;
-    this._routesModel = new PointsModel();
-    this._points = [...this._routesModel.points];
+    this.#container = container;
+    this.#routesModel = new PointsModel();
+    this.#points = [...this.#routesModel.points];
 
-    render(new SortingView(), this._container);
-    render(this._listRoutes, this._container);
-
-    this._openEdit = (editPointComponent, pointComponent) => {
-      this._listRoutes.element.replaceChild(editPointComponent.element, pointComponent.element);
-    };
-
-    this._closeEdit = (editPointComponent, pointComponent) => {
-      this._listRoutes.element.replaceChild(pointComponent.element, editPointComponent.element);
-    };
-
-    this._escKeyDownHandler = (evt) => {
-      if (evt.key === 'Escape' || evt.key === 'Esc') {
-        evt.preventDefault();
-        this._closeEdit();
-        document.removeEventListener('keydown', this._escKeyDownHandler);
-      }
-    };
-
-    this._createPoint = (point) => {
-      const pointComponent = new PointView(point);
-      const editPointComponent = new EditPointView(point);
-
-      pointComponent.element.querySelector('.event__rollup-btn').addEventListener('click', () => {
-        this._openEdit(editPointComponent, pointComponent);
-        document.addEventListener('keydown', this._escKeyDownHandler);
-      });
-
-      editPointComponent.element.querySelector('.event__rollup-btn').addEventListener('click', () => {
-        this._closeEdit(editPointComponent, pointComponent);
-        document.removeEventListener('keydown', this._escKeyDownHandler);
-      });
-
-      editPointComponent.element.querySelector('.event__save-btn').addEventListener('click', (evt) => {
-        evt.preventDefault();
-        this._closeEdit();
-        document.removeEventListener('keydown', this._escKeyDownHandler);
-      });
-
-      render(pointComponent, this._listRoutes.element);
-    };
-
-    if (this._points.length === 0) {
-      render(new NoPointView(), this._listRoutes.element);
+    if (this.#points.length === 0) {
+      render(new NoPointView(), this.#listPoints.element);
     } else {
-      this._points.forEach((point) => this._createPoint(point));
+      render(new SortingView(), this.#container);
+      render(this.#listPoints, this.#container);
+      this.#points.forEach((point) => this.#createPoint(point));
     }
+  }
+
+  #replaceComponents(firstComponent, secondComponent) {
+    replace(firstComponent, secondComponent);
+  }
+
+  #escKeyDownHandler(evt) {
+    if (evt.key === 'Escape' || evt.key === 'Esc') {
+      evt.preventDefault();
+      this.#replaceComponents();
+      document.removeEventListener('keydown', this.#escKeyDownHandler);
+    }
+  }
+
+  #createPoint(point) {
+    const pointComponent = new PointView(point);
+    const editPointComponent = new EditPointView(point);
+
+    pointComponent.setEditClickHandler(() => {
+      this.#replaceComponents(editPointComponent, pointComponent);
+      document.addEventListener('keydown', this.#escKeyDownHandler);
+    });
+
+    editPointComponent.setPointClickHandler(() => {
+      this.#replaceComponents(pointComponent, editPointComponent);
+      document.removeEventListener('keydown', this.#escKeyDownHandler);
+    });
+
+    editPointComponent.setSubmitHandler(() => {
+      this.#replaceComponents(pointComponent, editPointComponent);
+      document.removeEventListener('keydown', this.#escKeyDownHandler);
+    });
+
+    render(pointComponent, this.#listPoints.element);
   }
 }
