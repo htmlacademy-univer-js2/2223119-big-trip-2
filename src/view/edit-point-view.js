@@ -1,5 +1,5 @@
 import AbstractView from '../framework/view/abstract-view';
-import { APPOINTMENTS, OFFERS, OFFERS_BY_TYPE } from '../mock/route.js';
+import { APPOINTMENTS, OFFERS, OFFERS_BY_TYPE } from '../mock/point.js';
 
 const createDestionations = (destinations) =>
   destinations.reduce((result, destination) =>

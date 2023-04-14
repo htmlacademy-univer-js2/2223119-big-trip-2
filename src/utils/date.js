@@ -22,14 +22,4 @@ const calculateTime = (startDate, endDate) => {
   return dayjs.duration(diffInTotalMinutes, 'minutes').format('DD[D] HH[H] mm[M]');
 };
 
-const favoritePoint = (isFavorite) => (isFavorite) ? 'event__favorite-btn--active' : '';
-
-function generateRandom(a, b) {
-  const lower = Math.ceil(Math.min(Math.abs(a), Math.abs(b)));
-  const upper = Math.floor(Math.max(Math.abs(a), Math.abs(b)));
-  const result = Math.random() * (upper - lower + 1) + lower;
-
-  return Math.floor(result);
-}
-
-export { humanizeDay, humanizeHour, calculateTime, favoritePoint, generateRandom };
+export { humanizeDay, humanizeHour, calculateTime };

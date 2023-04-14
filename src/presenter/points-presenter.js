@@ -3,7 +3,6 @@ import EditPointView from '../view/edit-point-view.js';
 import PointView from '../view/point-view.js';
 import SortingView from '../view/sorting-view.js';
 import ListPointsView from '../view/list-points-view.js';
-import PointsModel from '../model/point-model.js';
 import NoPointView from '../view/no-point-view.js';
 
 export default class PointsPresenter {
@@ -16,9 +15,9 @@ export default class PointsPresenter {
     this.#listPoints = new ListPointsView();
   }
 
-  init(container) {
+  init(container, pointsModel) {
     this.#container = container;
-    this.#routesModel = new PointsModel();
+    this.#routesModel = pointsModel;
     this.#points = [...this.#routesModel.points];
 
     if (this.#points.length === 0) {
