@@ -1,6 +1,6 @@
-import { generateRandom } from '../utils.js';
+import { generateRandom } from '../utils/random.js';
+import { POINTS_TYPES } from '../utils/constants.js';
 
-const TYPES = ['taxi', 'bus', 'train', 'ship', 'drive', 'flight', 'check-in', 'sightseeing', 'restaurant'];
 const OFFER_TITLES = ['Upgrade to a business class', 'Switch to comfort', 'Rent a car', 'Add breakfast', 'Order taxi', 'Add luggage'];
 const APPOINTMENTS = [
   {
@@ -40,9 +40,9 @@ const APPOINTMENTS = [
 
 const generateOfferTypes = () => {
   const offerByTypes = [];
-  for (let i = 0; i < TYPES.length; i++) {
+  for (let i = 0; i < POINTS_TYPES.length; i++) {
     offerByTypes.push({
-      type: TYPES[i],
+      type: POINTS_TYPES[i],
       offers: [... new Set(Array.from({ length: generateRandom(1, OFFER_TITLES.length) }, () => generateRandom(1, OFFER_TITLES.length - 1)))]
     });
   }
@@ -63,8 +63,8 @@ const generateOffersArray = () => {
   return offers;
 };
 
-const OFFERS = generateOffersArray();
 const OFFERS_BY_TYPE = generateOfferTypes();
+const OFFERS = generateOffersArray();
 
 const generateRoute = () => (
   {
@@ -74,7 +74,7 @@ const generateRoute = () => (
     destination: generateRandom(1, APPOINTMENTS.length),
     isFavorite: Boolean(generateRandom(0, 1)),
     offers: [... new Set(Array.from({ length: generateRandom(0, OFFERS.length) }, () => generateRandom(1, OFFERS.length - 1)))],
-    type: TYPES[generateRandom(0, TYPES.length - 1)],
+    type: POINTS_TYPES[generateRandom(0, POINTS_TYPES.length - 1)],
   });
 
 export { generateRoute, APPOINTMENTS, OFFERS_BY_TYPE, OFFERS};

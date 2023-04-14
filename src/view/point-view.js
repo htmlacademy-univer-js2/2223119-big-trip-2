@@ -1,6 +1,8 @@
 import AbstractView from '../framework/view/abstract-view';
-import { APPOINTMENTS, OFFERS } from '../mock/route.js';
-import { humanizeDay, humanizeHour, calculateTime, favoritePoint } from '../utils.js';
+import { APPOINTMENTS, OFFERS } from '../mock/point.js';
+import { humanizeDay, humanizeHour, calculateTime } from '../utils/date.js';
+
+const favoritePoint = (isFavorite) => (isFavorite) ? 'event__favorite-btn--active' : '';
 
 const createOffer = (offers) =>
   offers.reduce((result, offer) => {
