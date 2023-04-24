@@ -3,7 +3,6 @@ const POINTS_TYPES = ['taxi', 'bus', 'train', 'ship', 'drive', 'flight', 'check-
 const FILTERS_TYPES = {
   everything: 'Everything',
   future: 'Future',
-  present: 'present',
   past: 'Past ',
 };
 

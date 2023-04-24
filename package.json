@@ -27,6 +27,7 @@
     "babel-preset-env": "1.7.0",
     "copy-webpack-plugin": "11.0.0",
     "dayjs": "1.11.7",
+    "nanoid": "^4.0.2",
     "webpack-dev-server": "4.11.1"
   },
   "browserslist": [
