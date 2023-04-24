@@ -1,4 +1,5 @@
-import { generateRandom } from '../utils/random.js';
+import { nanoid } from 'nanoid';
+import { generateRandom } from '../utils/common.js';
 import { POINTS_TYPES } from '../utils/constants.js';
 
 const OFFER_TITLES = ['Upgrade to a business class', 'Switch to comfort', 'Rent a car', 'Add breakfast', 'Order taxi', 'Add luggage'];
@@ -66,8 +67,9 @@ const generateOffersArray = () => {
 const OFFERS_BY_TYPE = generateOfferTypes();
 const OFFERS = generateOffersArray();
 
-const generateRoute = () => (
+const generatePoint = () => (
   {
+    id: nanoid(),
     basePrice: generateRandom(100, 500),
     startDate: '2019-07-11T09:54:56.845Z',
     endDate: '2019-07-15T11:22:13.375Z',
@@ -77,4 +79,4 @@ const generateRoute = () => (
     type: POINTS_TYPES[generateRandom(0, POINTS_TYPES.length - 1)],
   });
 
-export { generateRoute, APPOINTMENTS, OFFERS_BY_TYPE, OFFERS};
+export { generatePoint, APPOINTMENTS, OFFERS_BY_TYPE, OFFERS};

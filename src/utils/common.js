@@ -6,4 +6,8 @@ function generateRandom(a, b) {
   return Math.floor(result);
 }
 
-export { generateRandom };
+function updateItem(items, update) {
+  return items.map((item) => item.id === update.id ? update : item);
+}
+
+export { generateRandom, updateItem };

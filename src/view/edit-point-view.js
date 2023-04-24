@@ -129,34 +129,23 @@ const createEditPointTemplate = (event) => {
 
 
 export default class EditPointView extends AbstractView {
-  #point;
+  #point = null;
+  #handleCloseEditClick = null;
 
-  constructor(point) {
+  constructor({point, onCloseEditClick}) {
     super();
     this.#point = point;
+    this.#handleCloseEditClick = onCloseEditClick;
+
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#editClickHandler);
   }
 
   get template() {
     return createEditPointTemplate(this.#point);
   }
 
-  #pointClickHandler = (evt) => {
+  #editClickHandler = (evt) => {
     evt.preventDefault();
-    this._callback.click();
-  };
-
-  #submitHandler = (evt) =>{
-    evt.preventDefault();
-    this._callback.click();
-  };
-
-  setPointClickHandler = (evt) => {
-    this._callback.click = evt;
-    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#pointClickHandler);
-  };
-
-  setSubmitHandler = (evt) => {
-    this._callback.click = evt;
-    this.element.querySelector('.event__save-btn').addEventListener('submit', this.#submitHandler);
+    this.#handleCloseEditClick(this.#point);
   };
 }
