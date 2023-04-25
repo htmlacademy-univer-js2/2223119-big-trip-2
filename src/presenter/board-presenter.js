@@ -3,15 +3,19 @@ import SortingView from '../view/sorting-view.js';
 import ListPointsView from '../view/list-points-view.js';
 import NoPointView from '../view/no-point-view.js';
 import PointsPresenter from './points-presenter.js';
-import { updateItem } from '../utils/common.js';
+import { updateItem, sortByPrice, sortByTime } from '../utils/common.js';
+import { SORTING_TYPES } from '../utils/constants.js';
 
 export default class BoardPresenter {
   #container = null;
   #pointsModel = null;
 
   #listPointsComponent = new ListPointsView();
-  #sortComponent = new SortingView();
+  #sortComponent = null;
   #noPointComponent = new NoPointView();
+
+  #currentSortType = SORTING_TYPES.DEFAULT;
+  #sourcedBoardPoints = [];
 
   #points = [];
   #pointsPresenters = new Map();
@@ -23,6 +27,7 @@ export default class BoardPresenter {
 
   init() {
     this.#points = [...this.#pointsModel.points];
+    this.#sourcedBoardPoints = [...this.#pointsModel.points];
 
     this.#renderBoard();
   }
@@ -35,6 +40,39 @@ export default class BoardPresenter {
     this.#points = updateItem(this.#points, updatedTask);
     this.#pointsPresenters.get(updatedTask.id).init(updatedTask);
   };
+
+  #sortTasks(sortType) {
+    switch (sortType) {
+      case SORTING_TYPES.PRICE:
+        this.#points.sort(sortByPrice);
+        break;
+      case SORTING_TYPES.TIME:
+        this.#points.sort(sortByTime);
+        break;
+      default:
+        this.#points = [...this.#sourcedBoardPoints];
+    }
+
+    this.#currentSortType = sortType;
+  }
+
+  #handleSortTypeChange = (sortType) => {
+    if (this.#currentSortType === sortType) {
+      return;
+    }
+
+    this.#sortTasks(sortType);
+    this.#clearTaskList();
+    this.#renderPointsList();
+  };
+
+  #renderSort() {
+    this.#sortComponent = new SortingView({
+      onSortTypeChange: this.#handleSortTypeChange
+    });
+
+    render(this.#sortComponent, this.#container);
+  }
 
   #renderPoint = (point) => {
     const pointPrsenter = new PointsPresenter({
@@ -50,18 +88,15 @@ export default class BoardPresenter {
     points.forEach((point) => this.#renderPoint(point));
   };
 
-  // #clearPointList() {
-  //   this.#pointsPresenters.forEach((presenter) => presenter.destroy());
-  //   this.#pointsPresenters.clear();
-  // }
+
+  #clearTaskList() {
+    this.#pointsPresenters.forEach((presenter) => presenter.destroy());
+    this.#pointsPresenters.clear();
+  }
 
   #renderPointsList() {
     render(this.#listPointsComponent, this.#container);
     this.#renderPoints(this.#points);
-  }
-
-  #renderSort() {
-    render(this.#sortComponent, this.#container);
   }
 
   #renderNoPoints() {
@@ -77,46 +112,4 @@ export default class BoardPresenter {
     this.#renderSort();
     this.#renderPointsList();
   }
-
-  // #renderNoTasks() {
-  //   this.#noTaskComponent = new NoTaskView({
-  //     filterType: this.#filterType
-  //   });
-
-  //   render(this.#noTaskComponent, this.#boardComponent.element, RenderPosition.AFTERBEGIN);
-  // }
-
-  // #replaceComponents(firstComponent, secondComponent) {
-  //   replace(firstComponent, secondComponent);
-  // }
-
-  // #escKeyDownHandler(evt) {
-  //   if (evt.key === 'Escape' || evt.key === 'Esc') {
-  //     evt.preventDefault();
-  //     this.#replaceComponents();
-  //     document.removeEventListener('keydown', this.#escKeyDownHandler);
-  //   }
-  // }
-
-  // #createPoint(point) {
-  //   const pointComponent = new PointView(point);
-  //   const editPointComponent = new EditPointView(point);
-
-  //   pointComponent.setEditClickHandler(() => {
-  //     this.#replaceComponents(editPointComponent, pointComponent);
-  //     document.addEventListener('keydown', this.#escKeyDownHandler);
-  //   });
-
-  //   editPointComponent.setPointClickHandler(() => {
-  //     this.#replaceComponents(pointComponent, editPointComponent);
-  //     document.removeEventListener('keydown', this.#escKeyDownHandler);
-  //   });
-
-  //   editPointComponent.setSubmitHandler(() => {
-  //     this.#replaceComponents(pointComponent, editPointComponent);
-  //     document.removeEventListener('keydown', this.#escKeyDownHandler);
-  //   });
-
-  //   render(pointComponent, this.#listPoints.element);
-  // }
 }

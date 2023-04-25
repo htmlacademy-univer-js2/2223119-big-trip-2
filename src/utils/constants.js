@@ -6,4 +6,10 @@ const FILTERS_TYPES = {
   past: 'Past ',
 };
 
-export { POINTS_TYPES, FILTERS_TYPES };
+const SORTING_TYPES = {
+  DEFAULT: 'default',
+  PRICE: 'price',
+  TIME: 'time',
+};
+
+export { POINTS_TYPES, FILTERS_TYPES, SORTING_TYPES };
