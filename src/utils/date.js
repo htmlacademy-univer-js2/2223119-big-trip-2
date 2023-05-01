@@ -22,4 +22,21 @@ const calculateTime = (startDate, endDate) => {
   return dayjs.duration(diffInTotalMinutes, 'minutes').format('DD[D] HH[H] mm[M]');
 };
 
-export { humanizeDay, humanizeHour, calculateTime };
+function getSortUp(valueA, valueB) {
+  return valueA - valueB;
+}
+
+function sortTime(pointA, pointB) {
+  const timeA = dayjs(pointA.dateTo).diff(dayjs(pointA.dateFrom));
+  const timeB = dayjs(pointB.dateTo).diff(dayjs(pointB.dateFrom));
+  return getSortUp(timeA, timeB);
+}
+
+function sortPrice(pointA, pointB) {
+  const weight = getSortUp(pointA.basePrice, pointB.basePrice);
+
+  return weight;
+}
+
+
+export { humanizeDay, humanizeHour, calculateTime, sortTime, sortPrice };
