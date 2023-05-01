@@ -3,7 +3,7 @@ import { generateRandom } from '../utils/common.js';
 import { POINTS_TYPES } from '../utils/constants.js';
 
 const OFFER_TITLES = ['Upgrade to a business class', 'Switch to comfort', 'Rent a car', 'Add breakfast', 'Order taxi', 'Add luggage'];
-const APPOINTMENTS = [
+const DESTINATION = [
   {
     id: 1,
     description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
@@ -69,14 +69,14 @@ const OFFERS = generateOffersArray();
 
 const generatePoint = () => (
   {
-    id: nanoid(),
     basePrice: generateRandom(100, 500),
-    startDate: '2019-07-11T09:54:56.845Z',
-    endDate: '2019-07-15T11:22:13.375Z',
-    destination: generateRandom(1, APPOINTMENTS.length),
-    isFavorite: Boolean(generateRandom(0, 1)),
+    dateFrom: '2019-07-11T09:54:56.845Z',
+    dateTo: '2019-07-15T11:22:13.375Z',
+    destination: generateRandom(1, DESTINATION.length),
+    id: nanoid(),
+    isFavorite: false,
     offers: [... new Set(Array.from({ length: generateRandom(0, OFFERS.length) }, () => generateRandom(1, OFFERS.length - 1)))],
     type: POINTS_TYPES[generateRandom(0, POINTS_TYPES.length - 1)],
   });
 
-export { generatePoint, APPOINTMENTS, OFFERS_BY_TYPE, OFFERS};
+export { generatePoint, DESTINATION, OFFERS_BY_TYPE, OFFERS};

@@ -1,5 +1,5 @@
 import AbstractView from '../framework/view/abstract-view';
-import { APPOINTMENTS, OFFERS } from '../mock/point.js';
+import { DESTINATION, OFFERS } from '../mock/point.js';
 import { humanizeDay, humanizeHour, calculateTime } from '../utils/date.js';
 
 const favoritePoint = (isFavorite) => (isFavorite) ? 'event__favorite-btn--active' : '';
@@ -23,23 +23,23 @@ const createOffersList = (offers) =>
     : '';
 
 const createPointTemplate = (point) => {
-  const { basePrice, destination, startDate, endDate, isFavorite, offers, type } = point;
-  const name = APPOINTMENTS.find((item) => (item.id === destination)).name;
+  const{ basePrice, dateFrom, dateTo, destination, isFavorite, offers, type } = point;
+  const name = DESTINATION.find((item) => (item.id === destination)).name;
 
   return `<li class="trip-events__item">
         <div class="event">
-        <time class="event__date" datetime="${ humanizeDay(startDate) }">${ humanizeDay(startDate) }</time>
+        <time class="event__date" datetime="${ humanizeDay(dateFrom) }">${ humanizeDay(dateFrom) }</time>
         <div class="event__type">
-          <img class="event__type-icon" width="42" height="42" src="img/icons/sightseeing.png" alt="Event type icon">
+          <img class="event__type-icon" width="42" height="42" src="img/icons/${type}.png" alt="Event type icon">
         </div>
         <h3 class="event__title">${ type } ${ name }</h3>
         <div class="event__schedule">
           <p class="event__time">
-            <time class="event__start-time" datetime="${ humanizeHour(startDate) }">${ humanizeHour(startDate) }</time>
+            <time class="event__start-time" datetime="${ humanizeHour(dateFrom) }">${ humanizeHour(dateFrom) }</time>
             &mdash;
-            <time class="event__end-time" datetime="${ humanizeHour(endDate) }">${ humanizeHour(endDate) }</time>
+            <time class="event__end-time" datetime="${ humanizeHour(dateTo) }">${ humanizeHour(dateTo) }</time>
           </p>
-          <p class="event__duration">${ calculateTime(startDate, endDate) }</p>
+          <p class="event__duration">${ calculateTime(dateFrom, dateTo) }</p>
         </div>
           &euro;&nbsp;<span class="event__price">${ basePrice }</span>
         </p>
