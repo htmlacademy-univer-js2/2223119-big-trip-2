@@ -1,6 +1,8 @@
 import { render, replace, remove } from '../framework/render.js';
-import EditPointView from '../view/edit-point-view.js';
 import PointView from '../view/point-view.js';
+import EditPointView from '../view/edit-point-view.js';
+import { UserAction, UpdateType } from '../utils/constants.js';
+import { isDatesEqual, isPointRepeating } from '../utils/date.js';
 
 const Mode = {
   DEFAULT: 'DEFAULT',
@@ -33,7 +35,7 @@ export default class PointsPresenter {
     this.#pointComponent = new PointView({
       point: this.#point,
       onOpenEditClick: this.#handleOpenEditClick,
-      onFavoriteClick: this.#handleFavoriteClick,
+      onFavoriteClick: this.#handleFavoriteClick
     });
 
     this.#editPointComponent = new EditPointView({
@@ -79,30 +81,10 @@ export default class PointsPresenter {
     this.#mode = Mode.EDITING;
   };
 
-  #handleOpenEditClick = () => {
-    this.#replacePointToEdit();
-  };
-
-  #handleFavoriteClick = () => {
-    this.#handleDataChange({...this.#point, isFavorite: !this.#point.isFavorite});
-  };
-
   #replaceEditToPoint = () => {
     replace(this.#pointComponent, this.#editPointComponent);
     document.removeEventListener('keydown', this.#escKeyDownHandler);
     this.#mode = Mode.DEFAULT;
-  };
-
-  #handleFormSave = (task) => {
-    this.#handleDataChange(task);
-    this.#replaceEditToPoint();
-  };
-
-  #handleDeleteClick = () => { };
-
-  #handleCloseEditClick = () => {
-    this.#editPointComponent.reset(this.#point);
-    this.#replaceEditToPoint();
   };
 
   #escKeyDownHandler(evt) {
@@ -112,4 +94,40 @@ export default class PointsPresenter {
       this.#replaceEditToPoint();
     }
   }
+
+  #handleOpenEditClick = () => {
+    this.#replacePointToEdit();
+  };
+
+  #handleFavoriteClick = () => {
+    this.#handleDataChange(
+      UserAction.UPDATE_POINT,
+      UpdateType.MINOR,
+      {...this.#point, isFavorite: !this.#point.isFavorite});
+  };
+
+  #handleCloseEditClick = () => {
+    this.#replaceEditToPoint();
+  };
+
+  #handleFormSave = (update) => {
+    const isMinorUpdate =
+      !isDatesEqual(this.#point.dueDate, update.dueDate) ||
+      isPointRepeating(this.#point.repeating) !== isPointRepeating(update.repeating);
+
+    this.#handleDataChange(
+      UserAction.UPDATE_POINT,
+      isMinorUpdate ? UpdateType.MINOR : UpdateType.PATCH,
+      update,
+    );
+    this.#replaceEditToPoint();
+  };
+
+  #handleDeleteClick = (point) => {
+    this.#handleDataChange(
+      UserAction.DELETE_POINT,
+      UpdateType.MINOR,
+      point,
+    );
+  };
 }
