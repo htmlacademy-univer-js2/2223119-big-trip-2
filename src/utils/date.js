@@ -22,21 +22,28 @@ const calculateTime = (startDate, endDate) => {
   return dayjs.duration(diffInTotalMinutes, 'minutes').format('DD[D] HH[H] mm[M]');
 };
 
-function getSortUp(valueA, valueB) {
+function SortDay(valueA, valueB) {
   return valueA - valueB;
 }
 
 function sortTime(pointA, pointB) {
   const timeA = dayjs(pointA.dateTo).diff(dayjs(pointA.dateFrom));
   const timeB = dayjs(pointB.dateTo).diff(dayjs(pointB.dateFrom));
-  return getSortUp(timeA, timeB);
+  return SortDay(timeA, timeB);
 }
 
 function sortPrice(pointA, pointB) {
-  const weight = getSortUp(pointA.basePrice, pointB.basePrice);
+  const weight = SortDay(pointA.basePrice, pointB.basePrice);
 
   return weight;
 }
 
+function isDatesEqual(dateA, dateB) {
+  return (dateA === null && dateB === null) || dayjs(dateA).isSame(dateB, 'D');
+}
 
-export { humanizeDay, humanizeHour, calculateTime, sortTime, sortPrice };
+function isPointRepeating(repeating) {
+  return Object.values(repeating).some(Boolean);
+}
+
+export { humanizeDay, humanizeHour, calculateTime, SortDay, sortTime, sortPrice, isDatesEqual, isPointRepeating };

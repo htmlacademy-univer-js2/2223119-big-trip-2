@@ -1,15 +1,27 @@
 const POINTS_TYPES = ['taxi', 'bus', 'train', 'ship', 'drive', 'flight', 'check-in', 'sightseeing', 'restaurant'];
 
-const FILTERS_TYPES = {
-  everything: 'Everything',
-  future: 'Future',
-  past: 'Past ',
+const FilterType = {
+  EVERYTHING: 'everything',
+  FUTURE: 'future',
+  PAST: 'past',
 };
 
-const SORTING_TYPES = {
+const SortType = {
   DEFAULT: 'default',
   PRICE: 'price',
   TIME: 'time',
 };
 
-export { POINTS_TYPES, FILTERS_TYPES, SORTING_TYPES };
+const UserAction = {
+  UPDATE_POINT: 'UPDATE_POINT',
+  ADD_POINT: 'ADD_POINT',
+  DELETE_POINT: 'DELETE_POINT',
+};
+
+const UpdateType = {
+  PATCH: 'PATCH',
+  MINOR: 'MINOR',
+  MAJOR: 'MAJOR',
+};
+
+export { POINTS_TYPES, FilterType, SortType, UserAction, UpdateType };
