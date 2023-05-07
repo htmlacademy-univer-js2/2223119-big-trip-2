@@ -2,7 +2,7 @@ import { render, replace, remove } from '../framework/render.js';
 import PointView from '../view/point-view.js';
 import EditPointView from '../view/edit-point-view.js';
 import { UserAction, UpdateType } from '../utils/constants.js';
-import { isDatesEqual, isPointRepeating } from '../utils/date.js';
+import { isDatesEqual } from '../utils/date.js';
 
 const Mode = {
   DEFAULT: 'DEFAULT',
@@ -18,6 +18,8 @@ export default class PointsPresenter {
   #editPointComponent = null;
 
   #point = null;
+  #offers = null;
+  #destinations = null;
   #mode = Mode.DEFAULT;
 
   constructor({pointListContainer, onDataChange, onModeChange}) {
@@ -26,20 +28,26 @@ export default class PointsPresenter {
     this.#handleModeChange = onModeChange;
   }
 
-  init = (point) => {
+  init = (point, offers, destinations) => {
     this.#point = point;
+    this.#offers = offers;
+    this.#destinations = destinations;
 
     const prevPointComponent = this.#pointComponent;
     const prevEditPointComponent = this.#editPointComponent;
 
     this.#pointComponent = new PointView({
       point: this.#point,
+      allOffers: this.#offers,
+      allDestinations: this.#destinations,
       onOpenEditClick: this.#handleOpenEditClick,
       onFavoriteClick: this.#handleFavoriteClick
     });
 
     this.#editPointComponent = new EditPointView({
       point: this.#point,
+      allOffers: this.#offers,
+      allDestinations: this.#destinations,
       onSaveClick: this.#handleFormSave,
       onDeleteClick: this.#handleDeleteClick,
       onCloseEditClick: this.#handleCloseEditClick
@@ -112,8 +120,7 @@ export default class PointsPresenter {
 
   #handleFormSave = (update) => {
     const isMinorUpdate =
-      !isDatesEqual(this.#point.dueDate, update.dueDate) ||
-      isPointRepeating(this.#point.repeating) !== isPointRepeating(update.repeating);
+      !isDatesEqual(this.#point.dueDate, update.dueDate);
 
     this.#handleDataChange(
       UserAction.UPDATE_POINT,
