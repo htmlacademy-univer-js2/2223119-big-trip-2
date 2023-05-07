@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
-import { FilterType } from '../utils/constants';
+import { FilterType } from '../utils/constants.js';
 
 dayjs.extend(isSameOrBefore);
 dayjs.extend(isSameOrAfter);

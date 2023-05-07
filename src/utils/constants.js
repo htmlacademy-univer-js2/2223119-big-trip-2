@@ -1,5 +1,3 @@
-const POINTS_TYPES = ['taxi', 'bus', 'train', 'ship', 'drive', 'flight', 'check-in', 'sightseeing', 'restaurant'];
-
 const FilterType = {
   EVERYTHING: 'everything',
   FUTURE: 'future',
@@ -22,6 +20,7 @@ const UpdateType = {
   PATCH: 'PATCH',
   MINOR: 'MINOR',
   MAJOR: 'MAJOR',
+  INIT: 'INIT',
 };
 
-export { POINTS_TYPES, FilterType, SortType, UserAction, UpdateType };
+export { FilterType, SortType, UserAction, UpdateType };

@@ -1,65 +1,67 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
-import { DESTINATION, OFFERS, OFFERS_BY_TYPE } from '../mock/point.js';
-import { POINTS_TYPES } from '../utils/constants.js';
-import { humanizeDay, humanizeHour } from '../utils/date.js';
-import { generateRandom } from '../utils/common.js';
+import { DATE_FORMAT, humanizeDate } from '../utils/date.js';
 import flatpickr from 'flatpickr';
-
+import { returnDestanition } from '../utils/point-inf.js';
 import 'flatpickr/dist/flatpickr.min.css';
 
 const BLANK_POINT = {
-  basePrice: generateRandom(100, 110),
-  dateFrom: '2019-03-18T12:25:56.000',
-  dateTo: '2019-03-09T13:35:13.000',
-  destination: DESTINATION[generateRandom(0, DESTINATION.length - 1)],
-  city: 'Moscow',
-  id: '0',
-  offers: OFFERS[generateRandom(0, OFFERS.length - 1)],
-  type: POINTS_TYPES[generateRandom(0, POINTS_TYPES.length - 1)],
-  img: DESTINATION[generateRandom(0, DESTINATION.length - 1)].pictures[0].src
+  basePrice: 0,
+  destination: '',
+  city: '',
+  offers: [],
+  type: []
 };
 
-function returnDestanition(city){
-  const destanitionCity = DESTINATION.filter((item) => item.name === city);
-  return destanitionCity[0];
+function createOfferTypes(allOffers) {
+  const allTypes = allOffers.map(({type}) => type);
+  return allTypes.map((offerType, index) =>
+    `
+      <div class="event__type-item">
+        <input id="event-type-${offerType}-${index}" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${ offerType.type }">
+        <label class="event__type-label  event__type-label--${ offerType }" for="event-type-${offerType}-${index}">${ offerType }</label>
+      </div>
+    `
+  ).join('');
 }
 
-function returnThisOffer(offer) {
-  const offerCurrentArray = OFFERS_BY_TYPE.map(({offers}) => offers.filter((item) => item.title.toLowerCase() === offer.toLowerCase()));
+function createListCities(allDestinations) {
+  const allCities = allDestinations.map(({name}) => name);
+  return allCities.map((city) =>
+    `<option value="${ city }"></option>`
+  ).join('');
+}
+
+function returnThisOffer(offer, allOffers) {
+  const offerCurrentArray = allOffers.map(({offers}) => offers.filter((item) => item.title.toLowerCase() === offer.toLowerCase()));
   const offerCurrent = offerCurrentArray.filter((item) => item.length);
   return offerCurrent[0][0];
 }
 
-function createDestionations() {
-  const destinations = DESTINATION.map(({name}) => name);
-  return destinations.map((destination) =>
-    (`<option value="${ destination.name }"></option>\n`).join(''));
-}
+function createOffers(pointType, offers, allOffers) {
+  const allOffersForType = allOffers.find((point) => point.type === pointType).offers;
 
-const createAvailable = (offers, event) => {
-  const availableOffers = OFFERS_BY_TYPE.find((item) => (item.type === event)).offers;
-  let offerOptions = '';
-
-  for (const offerId of availableOffers) {
-    for (const offer of offers) {
-      if (offerId === offer.id) {
-        offerOptions = offerOptions.concat(`<div class="event__offer-selector">
-          <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.title.split(' ').pop()}-1" type="checkbox" name="event-offer-${offer.title.split(' ').pop()}">
-          <label class="event__offer-label" for="event-offer-${offer.title.split(' ').pop()}-1">
-            <span class="event__offer-title">${ offer.title }</span>
-            &plus;&euro;&nbsp;
-            <span class="event__offer-price">${ offer.price }</span>
-          </label>
-        </div>\n`);
-      }
-    }
+  function isOfferSelected(currentOffers, offer) {
+    if(currentOffers) {
+      return currentOffers.find( (currentOffer) => currentOffer === offer.id) ;
+    } return '';
   }
 
-  return offerOptions;
-};
+  return (
+    `${allOffersForType.map((offer, index) =>
+      `<div class="event__offer-selector">
+        <input class="event__offer-checkbox  visually-hidden" id="event-offer-luggage-${index}" type="checkbox" name="event-offer-luggage" ${ isOfferSelected(offers, offer) ? 'checked' : ''}  data-type="${ pointType }" data-offer-id="${offer.id}">
+        <label class="event__offer-label" for="event-offer-luggage-${index}">
+          <span class="event__offer-title">${ offer.title }</span>
+          &plus;&euro;&nbsp;
+          <span class="event__offer-price">${ offer.price }</span>
+        </label>
+      </div>`
+    ).join('')}`
+  );
+}
 
-function createDestinationTemplate(destination) {
-  const currentDestinition = returnDestanition(destination);
+function createDestinationTemplate(destination, allDestinations) {
+  const currentDestinition = returnDestanition(destination, allDestinations);
   const photosTape = currentDestinition === undefined ? '' : `
     <div class="event__photos-container">
       <div class="event__photos-tape">
@@ -76,8 +78,13 @@ function createDestinationTemplate(destination) {
   ` : '');
 }
 
-const createEditPointTemplate = (point) => {
-  const{ basePrice, dateFrom, dateTo, destination, type } = point;
+const createEditPointTemplate = (point, allOffers, allDestinations) => {
+  const{ basePrice, dateFrom, dateTo, destination, offers, type} = point;
+  const offerTypes = createOfferTypes(allOffers);
+  const cityList = createListCities(allDestinations);
+  const showOffers = createOffers(type, offers, allOffers);
+  const destinationInfo = createDestinationTemplate(destination, allDestinations);
+  const city = returnDestanition(destination, allDestinations) ? returnDestanition(destination, allDestinations).name : '';
 
   return `<form class="event event--edit" action="#" method="post">
             <header class="event__header">
@@ -90,70 +97,35 @@ const createEditPointTemplate = (point) => {
                 <div class="event__type-list">
                   <fieldset class="event__type-group">
                     <legend class="visually-hidden">Event type</legend>
-                    <div class="event__type-item">
-                      <input id="event-type-taxi-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="taxi">
-                      <label class="event__type-label  event__type-label--taxi" for="event-type-taxi-1">Taxi</label>
-                    </div>
-                    <div class="event__type-item">
-                      <input id="event-type-bus-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="bus">
-                      <label class="event__type-label  event__type-label--bus" for="event-type-bus-1">Bus</label>
-                    </div>
-                    <div class="event__type-item">
-                      <input id="event-type-train-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="train">
-                      <label class="event__type-label  event__type-label--train" for="event-type-train-1">Train</label>
-                    </div>
-                    <div class="event__type-item">
-                      <input id="event-type-ship-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="ship">
-                      <label class="event__type-label  event__type-label--ship" for="event-type-ship-1">Ship</label>
-                    </div>
-                    <div class="event__type-item">
-                      <input id="event-type-drive-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="drive">
-                      <label class="event__type-label  event__type-label--drive" for="event-type-drive-1">Drive</label>
-                    </div>
-                    <div class="event__type-item">
-                      <input id="event-type-flight-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="flight" checked>
-                      <label class="event__type-label  event__type-label--flight" for="event-type-flight-1">Flight</label>
-                    </div>
-                    <div class="event__type-item">
-                      <input id="event-type-check-in-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="check-in">
-                      <label class="event__type-label  event__type-label--check-in" for="event-type-check-in-1">Check-in</label>
-                    </div>
-                    <div class="event__type-item">
-                      <input id="event-type-sightseeing-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="sightseeing">
-                      <label class="event__type-label  event__type-label--sightseeing" for="event-type-sightseeing-1">Sightseeing</label>
-                    </div>
-                    <div class="event__type-item">
-                      <input id="event-type-restaurant-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="restaurant">
-                      <label class="event__type-label  event__type-label--restaurant" for="event-type-restaurant-1">Restaurant</label>
-                    </div>
+                    ${ offerTypes }
                   </fieldset>
                 </div>
               </div>
 
               <div class="event__field-group  event__field-group--destination">
                 <label class="event__label  event__type-output" for="event-destination-1">
-                ${type}
+                  ${ type }
                 </label>
-                <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${ type }" list="destination-list-1">
-                <datalist id="destination-list-1">
-                  ${ createDestionations }
+                <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${ city }" list="destination-${ point.id }">
+                <datalist id="destination-${ point.id }">
+                  ${ cityList }
                 </datalist>
               </div>
 
               <div class="event__field-group  event__field-group--time">
                 <label class="visually-hidden" for="event-start-time-1">From</label>
-                <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${ humanizeDay(dateFrom) } ${ humanizeHour(dateFrom) }">
+                <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${ humanizeDate(dateFrom, DATE_FORMAT.EDIT_DATE) } ${ humanizeDate(dateFrom, DATE_FORMAT.TIME) }">
                 &mdash;
                 <label class="visually-hidden" for="event-end-time-1">To</label>
-                <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${ humanizeDay(dateTo) } ${ humanizeHour(dateTo) }">
+                <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${ humanizeDate(dateTo, DATE_FORMAT.EDIT_DATE) } ${ humanizeDate(dateTo, DATE_FORMAT.TIME) }">
               </div>
 
               <div class="event__field-group  event__field-group--price">
-                <label class="event__label" for="event-price-1">
+                <label class="event__label" for="event-price-${ point.id }">
                   <span class="visually-hidden">Price</span>
                   &euro;
                 </label>
-                <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${basePrice}">
+                <input class="event__input  event__input--price" id="event-price-${ point.id }" type="text" name="event-price" value="${ basePrice }">
               </div>
 
               <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
@@ -167,29 +139,31 @@ const createEditPointTemplate = (point) => {
               <section class="event__section  event__section--offers">
                 <h3 class="event__section-title  event__section-title--offers">Offers</h3>
                 <div class="event__available-offers">
-                ${ createAvailable(OFFERS, type) }
+                  ${ showOffers }
                 </div>
               </section>
 
-              <section class="event__section  event__section--destination">
-                <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-                <p class="event__destination-description">${ createDestinationTemplate(destination) }</p>
-              </section>
+              ${ destinationInfo }
             </section>
           </form>`;
 };
 
 
 export default class EditPointView extends AbstractStatefulView {
+  #allOffers = null;
+  #allDestinations = null;
+
   #handleCloseEditClick = null;
   #handleSaveClick = null;
   #handleDeleteClick = null;
 
   #datepicker = null;
 
-  constructor({point = BLANK_POINT, onCloseEditClick, onSaveClick, onDeleteClick}) {
+  constructor({point = BLANK_POINT, allOffers, allDestinations, onCloseEditClick, onSaveClick, onDeleteClick}) {
     super();
-    this._setState(EditPointView.parsePointToState(point));
+    this.#allOffers = allOffers;
+    this.#allDestinations = allDestinations;
+    this._setState(EditPointView.parsePointToState(point, allOffers, allDestinations));
     this.#handleSaveClick = onSaveClick;
     this.#handleDeleteClick = onDeleteClick;
     this.#handleCloseEditClick = onCloseEditClick;
@@ -198,7 +172,7 @@ export default class EditPointView extends AbstractStatefulView {
   }
 
   get template() {
-    return createEditPointTemplate(this._state);
+    return createEditPointTemplate(this._state, this.#allOffers, this.#allDestinations);
   }
 
   removeElement() {
@@ -276,7 +250,7 @@ export default class EditPointView extends AbstractStatefulView {
 
   #offerChangeHandler = (evt) => {
     let selectedOffers = this._state.offers;
-    const offer = returnThisOffer(evt.target.dataset.offer);
+    const offer = returnThisOffer(evt.target.dataset.offer, this.#allOffers);
     if (evt.target.checked) {
       selectedOffers.push(offer);
       selectedOffers.sort();

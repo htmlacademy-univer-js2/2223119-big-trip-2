@@ -3,24 +3,41 @@ import duration from 'dayjs/plugin/duration';
 
 dayjs.extend(duration);
 
-const humanizeDay = (pointDate) => pointDate ? dayjs(pointDate).format('MMM D') : '';
-const humanizeHour = (pointDate) => pointDate ? dayjs(pointDate).format('HH:mm') : '';
-
-const calculateTime = (startDate, endDate) => {
-  const dateFrom = dayjs(startDate);
-  const dateTo = dayjs(endDate);
-
-  const diffInTotalMinutes = Math.ceil(dateTo.diff(dateFrom, 'minute', true));
-  const diffInHours = Math.floor(diffInTotalMinutes / 60) % 24;
-  const diffInDays = Math.floor(diffInTotalMinutes / (60 * 24));
-
-  if ((diffInDays === 0) && (diffInHours === 0)) {
-    return dayjs.duration(diffInTotalMinutes, 'minutes').format('mm[M]');
-  } else if (diffInDays === 0) {
-    return dayjs.duration(diffInTotalMinutes, 'minutes').format('HH[H] mm[M]');
-  }
-  return dayjs.duration(diffInTotalMinutes, 'minutes').format('DD[D] HH[H] mm[M]');
+const DATE_FORMAT = {
+  DATE : 'MMM D',
+  MONTH : 'MMM',
+  DAY : 'D',
+  TIME : 'HH:mm',
+  EDIT_DATE : 'DD/MM/YY'
 };
+
+function humanizeDate(dueDate, dateFormat) {
+  return dueDate ? dayjs(dueDate).format(dateFormat) : '';
+}
+
+function durationPoint(dateFrom, dateTo){
+  const from = dayjs(dateFrom);
+  const to = dayjs(dateTo);
+
+  const dayResult = to.diff(from, 'day');
+  const hourResult = to.diff(from, 'hour');
+  const minuteResult = to.diff(from, 'minute');
+
+  if (dayResult){
+    return (
+      `${ dayResult }D ${ Math.round(hourResult / 24) }H ${ Math.round(minuteResult / 24 * 60) }M`
+    );
+
+  } else if (hourResult){
+    return(
+      `${ hourResult }H ${ Math.round(minuteResult / 24) }M`
+    );
+  } else {
+    return(
+      `${ minuteResult }M`
+    );
+  }
+}
 
 function SortDay(valueA, valueB) {
   return valueA - valueB;
@@ -42,8 +59,4 @@ function isDatesEqual(dateA, dateB) {
   return (dateA === null && dateB === null) || dayjs(dateA).isSame(dateB, 'D');
 }
 
-function isPointRepeating(repeating) {
-  return Object.values(repeating).some(Boolean);
-}
-
-export { humanizeDay, humanizeHour, calculateTime, SortDay, sortTime, sortPrice, isDatesEqual, isPointRepeating };
+export { DATE_FORMAT, humanizeDate, durationPoint, SortDay, sortTime, sortPrice, isDatesEqual };
