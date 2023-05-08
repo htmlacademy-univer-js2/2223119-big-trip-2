@@ -3,13 +3,18 @@ import EditPointView from '../view/edit-point-view.js';
 import { UserAction, UpdateType } from '../utils/constants.js';
 
 export default class NewPointPresenter {
+  #allOffers = null;
+  #allDestinations = null;
+
   #pointListContainer = null;
   #handleDataChange = null;
   #handleDestroy = null;
 
   #editPointComponent = null;
 
-  constructor({pointListContainer, onDataChange, onDestroy}) {
+  constructor({ allOffers, allDestinations, pointListContainer, onDataChange, onDestroy }) {
+    this.#allOffers = allOffers;
+    this.#allDestinations = allDestinations;
     this.#pointListContainer = pointListContainer;
     this.#handleDataChange = onDataChange;
     this.#handleDestroy = onDestroy;
@@ -21,6 +26,8 @@ export default class NewPointPresenter {
     }
 
     this.#editPointComponent = new EditPointView({
+      allOffers: this.#allOffers,
+      allDestinations: this.#allDestinations,
       onFormSubmit: this.#handleFormSubmit,
       onDeleteClick: this.#handleDeleteClick
     });

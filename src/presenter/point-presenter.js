@@ -9,7 +9,7 @@ const Mode = {
   EDITING: 'EDITING',
 };
 
-export default class PointsPresenter {
+export default class PointPresenter {
   #pointListContainer = null;
   #handleDataChange = null;
   #handleModeChange = null;
@@ -22,7 +22,7 @@ export default class PointsPresenter {
   #destinations = null;
   #mode = Mode.DEFAULT;
 
-  constructor({pointListContainer, onDataChange, onModeChange}) {
+  constructor({ pointListContainer, onDataChange, onModeChange }) {
     this.#pointListContainer = pointListContainer;
     this.#handleDataChange = onDataChange;
     this.#handleModeChange = onModeChange;
@@ -154,15 +154,13 @@ export default class PointsPresenter {
   };
 
   #handleFormSave = (update) => {
-    const isMinorUpdate =
-      !isDatesEqual(this.#point.dueDate, update.dueDate);
+    const isMinorUpdate = isDatesEqual(this.#point.dateFrom, update.dateFrom);
 
     this.#handleDataChange(
       UserAction.UPDATE_POINT,
       isMinorUpdate ? UpdateType.MINOR : UpdateType.PATCH,
       update,
     );
-    this.#replaceEditToPoint();
   };
 
   #handleDeleteClick = (point) => {
@@ -171,5 +169,7 @@ export default class PointsPresenter {
       UpdateType.MINOR,
       point,
     );
+
+    document.removeEventListener('keydown', this.#escKeyDownHandler);
   };
 }

@@ -6,10 +6,10 @@ import { FilterType } from '../utils/constants.js';
 dayjs.extend(isSameOrBefore);
 dayjs.extend(isSameOrAfter);
 
-const filtersTypes = {
+const filter = {
   [FilterType.EVERYTHING]: (points) => points.filter((point) => point),
   [FilterType.FUTURE]: (points) => points.filter((point) => dayjs(point.dateFrom).isAfter(dayjs())),
   [FilterType.PAST]: (points) => points.filter((point) => dayjs(point.dateTo).isBefore(dayjs())),
 };
 
-export { filtersTypes };
+export { filter };
