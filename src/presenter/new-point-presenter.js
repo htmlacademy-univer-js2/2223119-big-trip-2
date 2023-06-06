@@ -3,13 +3,18 @@ import EditPointView from '../view/edit-point-view.js';
 import { UserAction, UpdateType } from '../utils/constants.js';
 
 export default class NewPointPresenter {
+  #allOffers = null;
+  #allDestinations = null;
+
   #pointListContainer = null;
   #handleDataChange = null;
   #handleDestroy = null;
 
   #editPointComponent = null;
 
-  constructor({pointListContainer, onDataChange, onDestroy}) {
+  constructor({ allOffers, allDestinations, pointListContainer, onDataChange, onDestroy }) {
+    this.#allOffers = allOffers;
+    this.#allDestinations = allDestinations;
     this.#pointListContainer = pointListContainer;
     this.#handleDataChange = onDataChange;
     this.#handleDestroy = onDestroy;
@@ -21,8 +26,11 @@ export default class NewPointPresenter {
     }
 
     this.#editPointComponent = new EditPointView({
-      onFormSubmit: this.#handleFormSubmit,
-      onDeleteClick: this.#handleDeleteClick
+      allOffers: this.#allOffers,
+      allDestinations: this.#allDestinations,
+      onSaveClick: this.#handleFormSubmit,
+      onDeleteClick: this.#handleDeleteClick,
+      onCloseEditClick: this.#handleDeleteClick
     });
 
     render(this.#editPointComponent, this.#pointListContainer, RenderPosition.AFTERBEGIN);
@@ -55,7 +63,6 @@ export default class NewPointPresenter {
       this.#editPointComponent.updateElement({
         isDisabled: false,
         isSaving: false,
-        isDeleting: false,
       });
     };
 
@@ -65,7 +72,7 @@ export default class NewPointPresenter {
   #handleFormSubmit = (point) => {
     this.#handleDataChange(
       UserAction.ADD_POINT,
-      UpdateType.MINOR,
+      UpdateType.MAJOR,
       point
     );
   };

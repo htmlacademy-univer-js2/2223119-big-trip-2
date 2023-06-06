@@ -5,7 +5,7 @@ const FilterType = {
 };
 
 const SortType = {
-  DEFAULT: 'default',
+  DAY: 'day',
   PRICE: 'price',
   TIME: 'time',
 };

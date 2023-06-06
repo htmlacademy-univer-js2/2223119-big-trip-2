@@ -2,14 +2,13 @@ import { render, replace, remove } from '../framework/render.js';
 import PointView from '../view/point-view.js';
 import EditPointView from '../view/edit-point-view.js';
 import { UserAction, UpdateType } from '../utils/constants.js';
-import { isDatesEqual } from '../utils/date.js';
 
 const Mode = {
   DEFAULT: 'DEFAULT',
   EDITING: 'EDITING',
 };
 
-export default class PointsPresenter {
+export default class PointPresenter {
   #pointListContainer = null;
   #handleDataChange = null;
   #handleModeChange = null;
@@ -18,36 +17,36 @@ export default class PointsPresenter {
   #editPointComponent = null;
 
   #point = null;
-  #offers = null;
-  #destinations = null;
+  #allOffers = null;
+  #allDestinations = null;
   #mode = Mode.DEFAULT;
 
-  constructor({pointListContainer, onDataChange, onModeChange}) {
+  constructor({ allOffers, allDestinations, pointListContainer, onDataChange, onModeChange }) {
+    this.#allOffers = allOffers;
+    this.#allDestinations = allDestinations;
     this.#pointListContainer = pointListContainer;
     this.#handleDataChange = onDataChange;
     this.#handleModeChange = onModeChange;
   }
 
-  init = (point, offers, destinations) => {
+  init = (point) => {
     this.#point = point;
-    this.#offers = offers;
-    this.#destinations = destinations;
 
     const prevPointComponent = this.#pointComponent;
     const prevEditPointComponent = this.#editPointComponent;
 
     this.#pointComponent = new PointView({
       point: this.#point,
-      allOffers: this.#offers,
-      allDestinations: this.#destinations,
+      allOffers: this.#allOffers,
+      allDestinations: this.#allDestinations,
       onOpenEditClick: this.#handleOpenEditClick,
       onFavoriteClick: this.#handleFavoriteClick
     });
 
     this.#editPointComponent = new EditPointView({
       point: this.#point,
-      allOffers: this.#offers,
-      allDestinations: this.#destinations,
+      allOffers: this.#allOffers,
+      allDestinations: this.#allDestinations,
       onSaveClick: this.#handleFormSave,
       onDeleteClick: this.#handleDeleteClick,
       onCloseEditClick: this.#handleCloseEditClick
@@ -154,22 +153,20 @@ export default class PointsPresenter {
   };
 
   #handleFormSave = (update) => {
-    const isMinorUpdate =
-      !isDatesEqual(this.#point.dueDate, update.dueDate);
-
     this.#handleDataChange(
       UserAction.UPDATE_POINT,
-      isMinorUpdate ? UpdateType.MINOR : UpdateType.PATCH,
+      UpdateType.MAJOR,
       update,
     );
-    this.#replaceEditToPoint();
   };
 
   #handleDeleteClick = (point) => {
     this.#handleDataChange(
       UserAction.DELETE_POINT,
-      UpdateType.MINOR,
+      UpdateType.MAJOR,
       point,
     );
+
+    document.removeEventListener('keydown', this.#escKeyDownHandler);
   };
 }

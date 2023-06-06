@@ -21,6 +21,7 @@ function createPointTemplate(point, allOffers, allDestinations) {
   const humanizeDateFrom = humanizeDate(dateFrom, DATE_FORMAT.DATE);
   const humanizeTimeFrom = humanizeDate(dateFrom, DATE_FORMAT.TIME);
   const humanizeTimeTo = humanizeDate(dateTo, DATE_FORMAT.TIME);
+  const durationTime = durationPoint(dateFrom, dateTo);
   const showOffers = createOffersList(type, offers, allOffers);
   const city = returnDestanition(destination, allDestinations) ? returnDestanition(destination, allDestinations).name : '';
 
@@ -38,7 +39,7 @@ function createPointTemplate(point, allOffers, allDestinations) {
             &mdash;
             <time class="event__end-time" datetime="${ dateTo }">${ humanizeTimeTo }</time>
           </p>
-          <p class="event__duration">${ durationPoint(dateFrom, dateTo) }</p>
+          <p class="event__duration">${ durationTime }</p>
         </div>
         <p class="event__price">
           &euro;&nbsp;<span class="event__price-value">${ basePrice }</span>
@@ -77,7 +78,7 @@ export default class PointView extends AbstractView {
     this.#handleFavoriteClick = onFavoriteClick;
 
     this.element.querySelector('.event__rollup-btn')
-      .addEventListener('click', this.#editClickHandler);
+      .addEventListener('click', this.#openEditClickHandler);
     this.element.querySelector('.event__favorite-btn')
       .addEventListener('click', this.#favoriteClickHandler);
   }
@@ -86,7 +87,7 @@ export default class PointView extends AbstractView {
     return createPointTemplate(this.#point, this.#allOffers, this.#allDestinations);
   }
 
-  #editClickHandler = (evt) => {
+  #openEditClickHandler = (evt) => {
     evt.preventDefault();
     this.#handleOpenEditClick();
   };

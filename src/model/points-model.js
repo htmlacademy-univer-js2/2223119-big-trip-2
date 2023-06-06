@@ -7,7 +7,7 @@ export default class PointsModel extends Observable {
   #offers = [];
   #destinations = [];
 
-  constructor({pointsApiService}) {
+  constructor({ pointsApiService }) {
     super();
     this.#pointsApiService = pointsApiService;
   }
@@ -48,26 +48,26 @@ export default class PointsModel extends Observable {
 
     try {
       const response = await this.#pointsApiService.updatePoint(update);
-      const updatedTask = this.#adaptToClient(response);
+      const updatedPoint = this.#adaptToClient(response);
       this.#points = [
         ...this.#points.slice(0, index),
-        updatedTask,
+        updatedPoint,
         ...this.#points.slice(index + 1),
       ];
-      this._notify(updateType, updatedTask);
+      this._notify(updateType, update);
     } catch(err) {
       throw new Error('Can\'t update point');
     }
   }
 
-  async addPonit(updateType, update) {
+  async addPoint(updateType, update) {
     try {
-      const response = await this.#pointsApiService.addPonit(update);
-      const newPoint = this.#adaptToClient(response);
+      const responce = await this.#pointsApiService.addPoint(update);
+      const newPoint = this.#adaptToClient(responce);
       this.#points = [newPoint, ...this.#points];
-      this._notify(updateType, newPoint);
-    } catch(err) {
-      throw new Error('Can\'t add point');
+      this._notify(updateType, update);
+    } catch {
+      throw new Error('Can\'t add task');
     }
   }
 
