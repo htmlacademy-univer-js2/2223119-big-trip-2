@@ -1,6 +1,3 @@
-import { render } from './framework/render.js';
-import NewPointButtonView from './view/new-point-button-view.js';
-import InformationPresenter from './presenter/information-presenter.js';
 import BoardPresenter from './presenter/board-presenter.js';
 import FiltersPresenter from './presenter/filters-presenter.js';
 import PointsModel from './model/points-model.js';
@@ -19,40 +16,18 @@ const pointsApiService = new PointsApiService(END_POINT, AUTHORIZATION);
 const pointsModel = new PointsModel({ pointsApiService: pointsApiService });
 const filterModel = new FilterModel();
 
-const informationPresenter = new InformationPresenter({
-  tripContainer: siteHeaderElement,
-  pointModel: pointsModel
-});
 const filterPresenter = new FiltersPresenter({
   filterContainer,
   filterModel,
   pointsModel
 });
 const boardPresenter = new BoardPresenter({
+  siteHeaderElement,
   boardContainer,
   pointsModel,
   filterModel,
-  onNewPointDestroy: handleNewPointFormClose
 });
 
-
-const newPointButtonComponent = new NewPointButtonView({
-  onClick: handleNewPointButtonClick
-});
-
-function handleNewPointFormClose() {
-  newPointButtonComponent.element.disabled = false;
-}
-
-function handleNewPointButtonClick() {
-  boardPresenter.createPoint();
-  newPointButtonComponent.element.disabled = true;
-}
-
-informationPresenter.init();
 filterPresenter.init();
 boardPresenter.init();
-pointsModel.init()
-  .finally(() => {
-    render(newPointButtonComponent, siteHeaderElement);
-  });
+pointsModel.init();

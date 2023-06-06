@@ -1,4 +1,3 @@
-import dayjs from 'dayjs';
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import { DATE_FORMAT, humanizeDate } from '../utils/date.js';
 import { returnDestanition } from '../utils/point-inf.js';
@@ -6,13 +5,13 @@ import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 
 const BLANK_POINT = {
-  basePrice: 0,
-  dateFrom: dayjs(),
-  dateTo:  dayjs(),
+  basePrice: 1000,
+  dateFrom: new Date(),
+  dateTo: new Date(),
   destination: 1,
   isFavorite: false,
   offers: [],
-  type: 'taxi'
+  type: 'taxi',
 };
 
 function createOfferTypes(allOffers) {
@@ -88,10 +87,7 @@ function createDestinationTemplate(destination, allDestinations) {
 }
 
 const createEditPointTemplate = (point, allOffers, allDestinations) => {
-  const isNewPoint = !('id' in point);
   const{ basePrice, dateFrom, dateTo, destination, offers, type, isDisabled, isSaving, isDeleting} = point;
-
-  console.log(allOffers)
 
   const offerTypes = createOfferTypes(allOffers);
   const cityList = createListCities(allDestinations);
@@ -121,8 +117,8 @@ const createEditPointTemplate = (point, allOffers, allDestinations) => {
                 <label class="event__label  event__type-output" for="event-destination-1">
                   ${ type }
                 </label>
-                <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${ city }" list="destination-${ point.id }" ${isDisabled ? 'disabled' : ''}>
-                <datalist id="destination-${ point.id }">
+                <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${ city }" list="destination-1" ${isDisabled ? 'disabled' : ''}>
+                <datalist id="destination-1">
                   ${ cityList }
                 </datalist>
               </div>
@@ -136,18 +132,18 @@ const createEditPointTemplate = (point, allOffers, allDestinations) => {
               </div>
 
               <div class="event__field-group  event__field-group--price">
-                <label class="event__label" for="event-price-${ point.id }">
+                <label class="event__label" for="event-price-1">
                   <span class="visually-hidden">Price</span>
                   &euro;
                 </label>
-                <input class="event__input  event__input--price" id="event-price-${ point.id }" type="text" name="event-price" value="${ basePrice }" ${isDisabled ? 'disabled' : ''}>
+                <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${ basePrice }" ${isDisabled ? 'disabled' : ''}>
               </div>
 
               <button class="event__save-btn  btn  btn--blue" type="submit">
                 ${ isSaving ? 'Saving...' : 'Save' }
               </button>
               <button class="event__reset-btn" type="reset">
-              ${ point.id ? deleting : 'Cancel'}</button>
+              ${ ('id' in point) ? deleting : 'Cancel'}</button>
               </button>
               <button class="event__rollup-btn" type="button">
                 <span class="visually-hidden">Open event</span>
@@ -254,25 +250,24 @@ export default class EditPointView extends AbstractStatefulView {
     if (destination === undefined) {
       this.reset(this._state);
     } else {
-      this.updateElement({ destination: destination.name });
+      this.updateElement({ destination: destination.id });
     }
   };
 
   #priceInputHandler = (evt) => {
-    evt.preventDefault();
-    const parsedPrice = parseInt(evt.target.value, 10);
-    const price = isNaN(parsedPrice) ? '' : parsedPrice;
-    this._setState({ basePrice: price });
+    this._setState({
+      basePrice: parseInt(evt.target.value, 10),
+    });
   };
 
   #formSaveHandler = (evt) => {
     evt.preventDefault();
-    this.#handleSaveClick(EditPointView.parseStateToPoint(this._state, this.#allDestinations));
+    this.#handleSaveClick(EditPointView.parseStateToPoint(this._state));
   };
 
   #deleteClickHandler = (evt) => {
     evt.preventDefault();
-    this.#handleDeleteClick(EditPointView.parseStateToPoint(this._state, this.#allDestinations));
+    this.#handleDeleteClick(EditPointView.parseStateToPoint(this._state));
   };
 
   #closeEditClickHandler = (evt) => {
@@ -295,76 +290,59 @@ export default class EditPointView extends AbstractStatefulView {
 
   #dateFromChangeHandler = ([userDate]) => {
     this.updateElement({
-      startDate: dayjs(userDate),
+      dateFrom: userDate,
     });
   };
 
   #setDatepickerFrom = () => {
     this.#datepickerFrom = flatpickr(
-      this.element.querySelector('[name = "event-start-time"]'),
+      this.element.querySelector('#event-start-time-1'),
       {
         enableTime: true,
         dateFormat: 'd/m/y H:i',
+        defaultDate: this._state.dateFrom,
         'time_24hr': true,
-        onChange: this.#dateFromChangeHandler
+        onClose: this.#dateFromChangeHandler
       },
     );
   };
 
   #dateToChangeHandler = ([userDate]) => {
     this.updateElement({
-      endDate: userDate,
+      dateTo: userDate,
     });
   };
 
   #setDatepickerTo = () => {
-    const refDate = dayjs(this._state.startDate).subtract(1, 'days');
     this.#datepickerTo = flatpickr(
       this.element.querySelector('[name = "event-end-time"]'),
       {
         enableTime: true,
         dateFormat: 'd/m/y H:i',
+        defaultDate: this._state.dateTo,
         'time_24hr': true,
-        onChange: this.#dateToChangeHandler,
-        disable: [
-          function (date) {
-            return date <= refDate;
-          }
-        ]
+        onClose: this.#dateToChangeHandler,
       },
     );
   };
 
-  static parsePointToState(point, allOffers, allDestinations) {
-    if (!('id' in point)) {
-      return {
-        ...point,
-        isDisabled: false,
-        isSaving: false,
-        isDeleting: false
-      };
-    }
+  static parsePointToState(point) {
     return {
       ...point,
-      selectedDestinationName: allDestinations.find((item) => (item.id === point.destination)).name,
-      availableOffers: allOffers.find((item) => (item.type === point.type)).offers,
       isDisabled: false,
       isSaving: false,
-      isDeleting: false
+      isDeleting: false,
     };
   }
 
-  static parseStateToPoint(state, allDestinations) {
+  static parseStateToPoint(state) {
     const point = {
-      ...state,
-      destination: allDestinations.find((item) => (item.name === state.selectedDestinationName)).id
+      ...state
     };
 
-    delete point.selectedDestinationName;
-    delete point.availableOffers;
+    delete point.isDeleting;
     delete point.isDisabled;
     delete point.isSaving;
-    delete point.isDeleting;
 
     return point;
   }

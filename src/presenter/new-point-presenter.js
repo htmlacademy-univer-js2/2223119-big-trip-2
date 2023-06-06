@@ -28,8 +28,9 @@ export default class NewPointPresenter {
     this.#editPointComponent = new EditPointView({
       allOffers: this.#allOffers,
       allDestinations: this.#allDestinations,
-      onFormSubmit: this.#handleFormSubmit,
-      onDeleteClick: this.#handleDeleteClick
+      onSaveClick: this.#handleFormSubmit,
+      onDeleteClick: this.#handleDeleteClick,
+      onCloseEditClick: this.#handleDeleteClick
     });
 
     render(this.#editPointComponent, this.#pointListContainer, RenderPosition.AFTERBEGIN);
@@ -62,7 +63,6 @@ export default class NewPointPresenter {
       this.#editPointComponent.updateElement({
         isDisabled: false,
         isSaving: false,
-        isDeleting: false,
       });
     };
 
@@ -72,7 +72,7 @@ export default class NewPointPresenter {
   #handleFormSubmit = (point) => {
     this.#handleDataChange(
       UserAction.ADD_POINT,
-      UpdateType.MINOR,
+      UpdateType.MAJOR,
       point
     );
   };

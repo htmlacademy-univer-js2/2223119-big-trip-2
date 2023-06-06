@@ -4,7 +4,6 @@ import { returnDestanition } from '../utils/point-inf';
 
 function createCities(points, allDestinations) {
   const cities = new Set();
-
   points.forEach((point) => {
     cities.add(returnDestanition(point.destination, allDestinations));
   });
