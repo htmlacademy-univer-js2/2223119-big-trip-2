@@ -39,24 +39,13 @@ function durationPoint(dateFrom, dateTo){
   }
 }
 
-function SortDay(valueA, valueB) {
-  return valueA - valueB;
-}
-
-function sortTime(pointA, pointB) {
-  const timeA = dayjs(pointA.dateTo).diff(dayjs(pointA.dateFrom));
-  const timeB = dayjs(pointB.dateTo).diff(dayjs(pointB.dateFrom));
-  return SortDay(timeA, timeB);
-}
-
-function sortPrice(pointA, pointB) {
-  const weight = SortDay(pointA.basePrice, pointB.basePrice);
-
-  return weight;
-}
-
 function isDatesEqual(dateA, dateB) {
   return (dateA === null && dateB === null) || dayjs(dateA).isSame(dateB, 'D');
 }
 
-export { DATE_FORMAT, humanizeDate, durationPoint, SortDay, sortTime, sortPrice, isDatesEqual };
+function isDatesOneAfterAnother(dateA, dateB) {
+  return dayjs(dateB).diff(dayjs(dateA)) > 0;
+}
+
+
+export { DATE_FORMAT, humanizeDate, durationPoint, isDatesEqual, isDatesOneAfterAnother };
