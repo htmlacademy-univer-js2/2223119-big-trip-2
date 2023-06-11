@@ -30,6 +30,7 @@ function createFiltersTemplate(filters, currentFilterType) {
   );
 }
 
+
 export default class FiltersView extends AbstractView {
   #filters = null;
   #currentFilter = null;

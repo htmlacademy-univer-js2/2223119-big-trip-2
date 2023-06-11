@@ -17,7 +17,7 @@ const createOffersList = (pointType, pointOffers, allOffers) => {
 };
 
 function createPointTemplate(point, allOffers, allDestinations) {
-  const{ basePrice, dateFrom, dateTo, destination, isFavorite, offers, type } = point;
+  const { basePrice, dateFrom, dateTo, destination, isFavorite, offers, type } = point;
   const humanizeDateFrom = humanizeDate(dateFrom, DATE_FORMAT.DATE);
   const humanizeTimeFrom = humanizeDate(dateFrom, DATE_FORMAT.TIME);
   const humanizeTimeTo = humanizeDate(dateTo, DATE_FORMAT.TIME);
@@ -62,6 +62,7 @@ function createPointTemplate(point, allOffers, allDestinations) {
   );
 }
 
+
 export default class PointView extends AbstractView {
   #point = null;
   #allOffers = null;
@@ -69,7 +70,7 @@ export default class PointView extends AbstractView {
   #handleOpenEditClick = null;
   #handleFavoriteClick = null;
 
-  constructor({point, allOffers, allDestinations, onOpenEditClick, onFavoriteClick}) {
+  constructor({ point, allOffers, allDestinations, onOpenEditClick, onFavoriteClick }) {
     super();
     this.#point = point;
     this.#allOffers = allOffers;

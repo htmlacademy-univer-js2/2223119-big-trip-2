@@ -8,6 +8,7 @@ function createLoadingTemplate() {
   );
 }
 
+
 export default class LoadingView extends AbstractView {
   get template() {
     return createLoadingTemplate();

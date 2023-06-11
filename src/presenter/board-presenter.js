@@ -6,6 +6,7 @@ import ListPointsView from '../view/list-points-view.js';
 import NoPointView from '../view/no-point-view.js';
 import LoadingView from '../view/loading-view.js';
 import NewPointButtonView from '../view/new-point-button-view.js';
+import ServerErrorView from '../view/server-error-view.js';
 import PointPresenter from './point-presenter.js';
 import NewPointPresenter from './new-point-presenter.js';
 import { sortDay, sortPrice, sortTime } from '../utils/sort.js';
@@ -27,6 +28,7 @@ export default class BoardPresenter {
   #informationComponent = null;
   #listPointsComponent = new ListPointsView();
   #loadingComponent = new LoadingView();
+  #serverErrorComponent = new ServerErrorView();
   #sortComponent = null;
   #noPointComponent = null;
   #newPointButtonComponent = null;
@@ -134,9 +136,13 @@ export default class BoardPresenter {
       case UpdateType.INIT:
         this.#isLoading = false;
         remove(this.#loadingComponent);
-        this.#createNewPointPresenter();
-        this.#renderNewPointButton(false);
-        this.#renderBoard();
+        if (this.#pointsModel.errored) {
+          this.#renderServerError();
+        } else {
+          this.#createNewPointPresenter();
+          this.#renderNewPointButton();
+          this.#renderBoard();
+        }
         break;
     }
   };
@@ -176,8 +182,9 @@ export default class BoardPresenter {
   #renderInformation = () => {
     if (this.#informationComponent === null) {
       this.#informationComponent = new InformationView({
-        points: this.#pointsModel.points,
-        allDestinations: this.#pointsModel.destinations
+        points: this.#pointsModel.points.sort(sortDay),
+        allDestinations: this.#pointsModel.destinations,
+        allOffers: this.#pointsModel.offers
       });
     }
     render(this.#informationComponent, this.#siteHeaderElement, RenderPosition.AFTERBEGIN);
@@ -227,6 +234,10 @@ export default class BoardPresenter {
     render(this.#loadingComponent, this.#boardContainer, RenderPosition.AFTERBEGIN);
   }
 
+  #renderServerError() {
+    render(this.#serverErrorComponent, this.#boardContainer, RenderPosition.AFTERBEGIN);
+  }
+
   #renderNoPoints() {
     this.#noPointComponent = new NoPointView({
       filterType: this.#filterType
@@ -238,6 +249,7 @@ export default class BoardPresenter {
   #clearBoard({ resetSortType = false } = {}) {
     this.#pointsPresenters.forEach((presenter) => presenter.destroy());
     this.#pointsPresenters.clear();
+    this.#newPointPresenter.destroy();
 
     remove(this.#sortComponent);
     remove(this.#noPointComponent);
@@ -246,7 +258,7 @@ export default class BoardPresenter {
       this.#currentSortType = SortType.DAY;
     }
 
-    this. #clearInformation();
+    this.#clearInformation();
   }
 
   #renderBoard() {

@@ -10,7 +10,7 @@ function createCities(points, allDestinations) {
 
   const arrayCities = Array.from(cities);
 
-  if (cities.length <= 3) {
+  if (arrayCities.length <= 3) {
     return (
       arrayCities.map((city, index, arr) => {
         if (index < arr.length - 1) {
@@ -37,21 +37,30 @@ function createDate(points) {
   return `${ monthFrom } ${ dateFrom } &mdash; ${ monthTo } ${ dateTo }`;
 }
 
-function calculateTotalPrice(points) {
-  const initialValue = 0;
-
+function calculateTotalPrice(points, allOffers) {
   const price = points.reduce(
     (accumulatorPrice, currentPrice) =>
-      accumulatorPrice + currentPrice.basePrice, initialValue
+      accumulatorPrice + currentPrice.basePrice, 0
   );
 
-  return price;
+  let offers = [];
+  let offersPrice = 0;
+
+  points.forEach((point) => {
+    offers = allOffers.find((offerByType) => offerByType.type === point.type).offers;
+    offersPrice += point.offers.reduce(
+      (currentValue, offer) =>
+        offers.find((off) => off.id === offer).price + currentValue, 0
+    );
+  });
+
+  return price + offersPrice;
 }
 
-function createInformationTemplate(points, allDestinations) {
+function createInformationTemplate(points, allDestinations, allOffers) {
   const cities = createCities(points, allDestinations);
   const date = createDate(points);
-  const totalPrice = calculateTotalPrice(points);
+  const totalPrice = calculateTotalPrice(points, allOffers);
 
   return (
     `<section class="trip-main__trip-info  trip-info">
@@ -69,14 +78,16 @@ function createInformationTemplate(points, allDestinations) {
 export default class InformationView extends AbstractView {
   #points = null;
   #allDestinations = null;
+  #allOffers = null;
 
-  constructor({ points, allDestinations }) {
+  constructor({ points, allDestinations, allOffers }) {
     super();
     this.#points = points;
     this.#allDestinations = allDestinations;
+    this.#allOffers = allOffers;
   }
 
   get template() {
-    return createInformationTemplate(this.#points, this.#allDestinations);
+    return createInformationTemplate(this.#points, this.#allDestinations, this.#allOffers);
   }
 }
