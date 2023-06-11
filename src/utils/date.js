@@ -43,4 +43,9 @@ function isDatesEqual(dateA, dateB) {
   return (dateA === null && dateB === null) || dayjs(dateA).isSame(dateB, 'D');
 }
 
-export { DATE_FORMAT, humanizeDate, durationPoint, isDatesEqual };
+function isDatesOneAfterAnother(dateA, dateB) {
+  return dayjs(dateB).diff(dayjs(dateA)) > 0;
+}
+
+
+export { DATE_FORMAT, humanizeDate, durationPoint, isDatesEqual, isDatesOneAfterAnother };
